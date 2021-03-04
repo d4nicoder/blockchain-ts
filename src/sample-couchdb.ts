@@ -14,8 +14,8 @@ const main = async () => {
   await addBlock.addBlock('Third block')
 
   const searchBlocks = new SearchBlocks(couchRepository)
-  const blocks = await searchBlocks.searchBlocks({})
-  console.log(blocks)
+  // const blocks = await searchBlocks.searchBlocks({})
+  // console.log(blocks)
 }
 
 main().catch(console.error)

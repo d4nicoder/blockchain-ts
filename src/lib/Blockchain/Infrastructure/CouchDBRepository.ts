@@ -2,24 +2,99 @@ import { IBlock } from "../../Block/Domain/Models/IBlock";
 import Block from "../../Block/Domain/ValueObjects/Block";
 import { IBlockchainRepository } from "../Domain/Models/IBlockchainRepository";
 import BlockCriteria from "../Domain/ValueObjects/BlockCriteria";
-const NodeCouchDB = require('node-couchdb')
-
+import axios from 'axios'
 export default class CouchDBRepository implements IBlockchainRepository {
-  private readonly connection
 
   private readonly DATABASE = 'blockchain'
 
-  constructor() {
+  constructor() { }
+
+  private getHeaders() {
+    const user = process.env.COUCH_DB_USER
+    const pass = process.env.COUCH_DB_PASS
+
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}`
+    }
+  }
+
+  private async query(url: string, method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE', body: string) {
+    const buf = Buffer.from(body)
+    const headers = { ...this.getHeaders(), ...{ 'Content-length': buf.length } }
     const port = process.env.COUCH_DB_PORT ? parseInt(process.env.COUCH_DB_PORT, 10) : 5984
-    this.connection = new NodeCouchDB({
-      host: process.env.COUCH_DB_HOST,
-      protocol: process.env.COUCH_DB_PROTOCOL,
-      port: port,
-      auth: {
-        user: process.env.COUCH_DB_USER,
-        pass: process.env.COUCH_DB_PASS
+    console.log(headers)
+    let uri = `${process.env.COUCH_DB_PROTOCOL}://${process.env.COUCH_DB_HOST}:${port}${url}`
+    let res
+    try {
+      res = await axios.request({
+        url: uri,
+        method,
+        headers,
+        data: buf
+      })
+    } catch (e) {
+      console.error(e.response.data)
+      throw e
+    }
+    console.log(res.data)
+    return res.data
+  }
+
+  private async ensureDatabase(): Promise<void> {
+    const dbs = await this.query('/_all_dbs', 'GET', '')
+    const exists: boolean = dbs.reduce((accum: boolean, db: string) => {
+      if (db === this.DATABASE) {
+        accum = true
       }
-    })
+      return accum
+    }, false)
+
+    if (!exists) {
+      // Let's create the database
+      const method = 'PUT'
+      const url = `/${this.DATABASE}`
+      await this.query(url, method, '')
+
+      // Create indexes
+      const indexMethod = 'POST'
+      const indexUrl = `/${this.DATABASE}/_index`
+      const indexBody = {
+        index: {
+          fields: [
+            "index"
+          ]
+        },
+        name: 'transaction-index',
+        type: 'json'
+      }
+
+      await this.query(indexUrl, indexMethod, JSON.stringify(indexBody))
+
+      const indexBody2 = {
+        index: {
+          fields: [
+            "previousHash"
+          ]
+        },
+        name: 'transaction-index',
+        type: 'json'
+      }
+
+      await this.query(indexUrl, indexMethod, JSON.stringify(indexBody2))
+
+      const indexBody3 = {
+        index: {
+          fields: [
+            "hash"
+          ]
+        },
+        name: 'hash-index',
+        type: 'json'
+      }
+
+      await this.query(indexUrl, indexMethod, JSON.stringify(indexBody3))
+    }
   }
 
   async get(criteria: BlockCriteria): Promise<IBlock[]> {
@@ -64,7 +139,10 @@ export default class CouchDBRepository implements IBlockchainRepository {
       ]
     }
 
-    const results = await this.connection.mango(this.DATABASE, queryObject, {})
+    const method = 'POST'
+    const url = `/${this.DATABASE}/_find`
+
+    const results = await await this.query(url, method, JSON.stringify(queryObject))
     console.log(results)
     return results
   }
@@ -79,8 +157,9 @@ export default class CouchDBRepository implements IBlockchainRepository {
       ],
       limit: 1
     }
-
-    const { data: { docs } } = await this.connection.mango(this.DATABASE, queryObject, {})
+    const method = 'POST'
+    const url = `/${this.DATABASE}/_find`
+    const { data: { docs } } = await this.query(url, method, JSON.stringify(queryObject))
     const result = docs[0]
 
     if (!result) {
@@ -90,13 +169,14 @@ export default class CouchDBRepository implements IBlockchainRepository {
   }
 
   async addBlock(block: Block): Promise<void> {
+    await this.ensureDatabase()
     const object = block.getBlock()
     const insert = {
       ...{ _id: object.hash },
       ...object
     }
-
-    await this.connection.insert(this.DATABASE, insert)
+    const url = `/${this.DATABASE}/${object.hash}`
+    await this.query(url, 'PUT', JSON.stringify(insert))
   }
 
 }
