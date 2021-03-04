@@ -2,8 +2,10 @@
   "name": "blockchain",
   "version": "0.0.1",
   "license": "MIT",
+  "main": "./dist/main.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node ./dist/main.js"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",

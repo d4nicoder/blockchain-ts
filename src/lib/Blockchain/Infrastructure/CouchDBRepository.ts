@@ -5,7 +5,7 @@ import BlockCriteria from "../Domain/ValueObjects/BlockCriteria";
 import axios from 'axios'
 export default class CouchDBRepository implements IBlockchainRepository {
 
-  private readonly DATABASE = 'blockchain'
+  private readonly DATABASE = process.env.COUCH_DB_DATABASE
 
   constructor() { }
 
@@ -23,7 +23,6 @@ export default class CouchDBRepository implements IBlockchainRepository {
     const buf = Buffer.from(body)
     const headers = { ...this.getHeaders(), ...{ 'Content-length': buf.length } }
     const port = process.env.COUCH_DB_PORT ? parseInt(process.env.COUCH_DB_PORT, 10) : 5984
-    console.log(headers)
     let uri = `${process.env.COUCH_DB_PROTOCOL}://${process.env.COUCH_DB_HOST}:${port}${url}`
     let res
     try {
@@ -37,7 +36,6 @@ export default class CouchDBRepository implements IBlockchainRepository {
       console.error(e.response.data)
       throw e
     }
-    console.log(res.data)
     return res.data
   }
 
@@ -159,13 +157,12 @@ export default class CouchDBRepository implements IBlockchainRepository {
     }
     const method = 'POST'
     const url = `/${this.DATABASE}/_find`
-    const { data: { docs } } = await this.query(url, method, JSON.stringify(queryObject))
-    const result = docs[0]
+    const { docs } = await this.query(url, method, JSON.stringify(queryObject))
 
-    if (!result) {
+    if (docs.length === 0) {
       throw new Error('Blockchain is empty')
     }
-    return result
+    return docs[0]
   }
 
   async addBlock(block: Block): Promise<void> {

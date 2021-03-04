@@ -40,21 +40,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
-var AddBlock_1 = __importDefault(require("./lib/Blockchain/Application/AddBlock"));
-var SearchBlocks_1 = __importDefault(require("./lib/Blockchain/Application/SearchBlocks"));
+var FileRepository_1 = __importDefault(require("./lib/Blockchain/Infrastructure/FileRepository"));
 var CouchDBRepository_1 = __importDefault(require("./lib/Blockchain/Infrastructure/CouchDBRepository"));
+var AddBlock_1 = __importDefault(require("./lib/Blockchain/Application/AddBlock"));
+dotenv_1.default.config();
+var args = process.argv.splice(2);
+var message = '';
+// Let's find the message data to store
+for (var i = 0; i < args.length; i++) {
+    if (i + 1 < args.length) {
+        if (args[i].startsWith('-m')) {
+            message = args[i + 1];
+        }
+    }
+}
+if (!message) {
+    // Message needed
+    console.error("\nError: Missing message\n------------------------\nUsage: [yarn|npm] start -m \"<message_to_store>\"\n");
+    process.exit(1);
+}
 var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var couchRepository, addBlock, searchBlocks;
+    var repository, addBlock;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                couchRepository = new CouchDBRepository_1.default();
-                addBlock = new AddBlock_1.default(couchRepository);
-                return [4 /*yield*/, addBlock.addBlock('Third block')];
+                repository = new FileRepository_1.default();
+                if (process.env.REPOSITORY === 'couchdb') {
+                    repository = new CouchDBRepository_1.default();
+                }
+                addBlock = new AddBlock_1.default(repository);
+                return [4 /*yield*/, addBlock.addBlock(message)];
             case 1:
                 _a.sent();
-                searchBlocks = new SearchBlocks_1.default(couchRepository);
                 return [2 /*return*/];
         }
     });

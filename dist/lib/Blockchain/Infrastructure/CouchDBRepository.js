@@ -46,25 +46,124 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var NodeCouchDB = require('node-couchdb');
+var axios_1 = __importDefault(require("axios"));
 var CouchDBRepository = /** @class */ (function () {
     function CouchDBRepository() {
-        this.DATABASE = 'blockchain';
-        var port = process.env.COUCH_DB_PORT ? parseInt(process.env.COUCH_DB_PORT, 10) : 5984;
-        this.connection = new NodeCouchDB({
-            host: process.env.COUCH_DB_HOST,
-            protocol: process.env.COUCH_DB_PROTOCOL,
-            port: port,
-            auth: {
-                user: process.env.COUCH_DB_USER,
-                pass: process.env.COUCH_DB_PASS
-            }
-        });
+        this.DATABASE = process.env.COUCH_DB_DATABASE;
     }
+    CouchDBRepository.prototype.getHeaders = function () {
+        var user = process.env.COUCH_DB_USER;
+        var pass = process.env.COUCH_DB_PASS;
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': "Basic " + Buffer.from(user + ":" + pass).toString('base64')
+        };
+    };
+    CouchDBRepository.prototype.query = function (url, method, body) {
+        return __awaiter(this, void 0, void 0, function () {
+            var buf, headers, port, uri, res, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        buf = Buffer.from(body);
+                        headers = __assign(__assign({}, this.getHeaders()), { 'Content-length': buf.length });
+                        port = process.env.COUCH_DB_PORT ? parseInt(process.env.COUCH_DB_PORT, 10) : 5984;
+                        uri = process.env.COUCH_DB_PROTOCOL + "://" + process.env.COUCH_DB_HOST + ":" + port + url;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, axios_1.default.request({
+                                url: uri,
+                                method: method,
+                                headers: headers,
+                                data: buf
+                            })];
+                    case 2:
+                        res = _a.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        e_1 = _a.sent();
+                        console.error(e_1.response.data);
+                        throw e_1;
+                    case 4: return [2 /*return*/, res.data];
+                }
+            });
+        });
+    };
+    CouchDBRepository.prototype.ensureDatabase = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var dbs, exists, method, url, indexMethod, indexUrl, indexBody, indexBody2, indexBody3;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.query('/_all_dbs', 'GET', '')];
+                    case 1:
+                        dbs = _a.sent();
+                        exists = dbs.reduce(function (accum, db) {
+                            if (db === _this.DATABASE) {
+                                accum = true;
+                            }
+                            return accum;
+                        }, false);
+                        if (!!exists) return [3 /*break*/, 6];
+                        method = 'PUT';
+                        url = "/" + this.DATABASE;
+                        return [4 /*yield*/, this.query(url, method, '')
+                            // Create indexes
+                        ];
+                    case 2:
+                        _a.sent();
+                        indexMethod = 'POST';
+                        indexUrl = "/" + this.DATABASE + "/_index";
+                        indexBody = {
+                            index: {
+                                fields: [
+                                    "index"
+                                ]
+                            },
+                            name: 'transaction-index',
+                            type: 'json'
+                        };
+                        return [4 /*yield*/, this.query(indexUrl, indexMethod, JSON.stringify(indexBody))];
+                    case 3:
+                        _a.sent();
+                        indexBody2 = {
+                            index: {
+                                fields: [
+                                    "previousHash"
+                                ]
+                            },
+                            name: 'transaction-index',
+                            type: 'json'
+                        };
+                        return [4 /*yield*/, this.query(indexUrl, indexMethod, JSON.stringify(indexBody2))];
+                    case 4:
+                        _a.sent();
+                        indexBody3 = {
+                            index: {
+                                fields: [
+                                    "hash"
+                                ]
+                            },
+                            name: 'hash-index',
+                            type: 'json'
+                        };
+                        return [4 /*yield*/, this.query(indexUrl, indexMethod, JSON.stringify(indexBody3))];
+                    case 5:
+                        _a.sent();
+                        _a.label = 6;
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
     CouchDBRepository.prototype.get = function (criteria) {
         return __awaiter(this, void 0, void 0, function () {
-            var filter, query, queryObject, results;
+            var filter, query, queryObject, method, url, results;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -102,8 +201,11 @@ var CouchDBRepository = /** @class */ (function () {
                                 }
                             ]
                         };
-                        return [4 /*yield*/, this.connection.mango(this.DATABASE, queryObject, {})];
-                    case 1:
+                        method = 'POST';
+                        url = "/" + this.DATABASE + "/_find";
+                        return [4 /*yield*/, this.query(url, method, JSON.stringify(queryObject))];
+                    case 1: return [4 /*yield*/, _a.sent()];
+                    case 2:
                         results = _a.sent();
                         console.log(results);
                         return [2 /*return*/, results];
@@ -113,7 +215,7 @@ var CouchDBRepository = /** @class */ (function () {
     };
     CouchDBRepository.prototype.getLast = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var queryObject, docs, result;
+            var queryObject, method, url, docs;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -126,28 +228,32 @@ var CouchDBRepository = /** @class */ (function () {
                             ],
                             limit: 1
                         };
-                        return [4 /*yield*/, this.connection.mango(this.DATABASE, queryObject, {})];
+                        method = 'POST';
+                        url = "/" + this.DATABASE + "/_find";
+                        return [4 /*yield*/, this.query(url, method, JSON.stringify(queryObject))];
                     case 1:
-                        docs = (_a.sent()).data.docs;
-                        result = docs[0];
-                        if (!result) {
+                        docs = (_a.sent()).docs;
+                        if (docs.length === 0) {
                             throw new Error('Blockchain is empty');
                         }
-                        return [2 /*return*/, result];
+                        return [2 /*return*/, docs[0]];
                 }
             });
         });
     };
     CouchDBRepository.prototype.addBlock = function (block) {
         return __awaiter(this, void 0, void 0, function () {
-            var object, insert;
+            var object, insert, url;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
+                    case 0: return [4 /*yield*/, this.ensureDatabase()];
+                    case 1:
+                        _a.sent();
                         object = block.getBlock();
                         insert = __assign({ _id: object.hash }, object);
-                        return [4 /*yield*/, this.connection.insert(this.DATABASE, insert)];
-                    case 1:
+                        url = "/" + this.DATABASE + "/" + object.hash;
+                        return [4 /*yield*/, this.query(url, 'PUT', JSON.stringify(insert))];
+                    case 2:
                         _a.sent();
                         return [2 /*return*/];
                 }
