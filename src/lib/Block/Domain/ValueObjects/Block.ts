@@ -40,14 +40,12 @@ export default class Block {
   mine(difficulty: number): void {
     const startString = Array(difficulty).fill('0').join('')
     const startTime = Date.now()
-    let i = 0
 
     while (!this.hash.startsWith(startString)) {
-      i++
       this.nonce++
       this.hash = this.createHash()
     }
 
-    console.log(`Block mined. Time elapsed: ${Date.now() - startTime} ms. Iterations: ${i}`)
+    console.log(`Block mined. Time elapsed: ${Date.now() - startTime} ms. Iterations: ${this.nonce}`)
   }
 }

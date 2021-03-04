@@ -27,13 +27,11 @@ var Block = /** @class */ (function () {
     Block.prototype.mine = function (difficulty) {
         var startString = Array(difficulty).fill('0').join('');
         var startTime = Date.now();
-        var i = 0;
         while (!this.hash.startsWith(startString)) {
-            i++;
             this.nonce++;
             this.hash = this.createHash();
         }
-        console.log("Block mined. Time elapsed: " + (Date.now() - startTime) + " ms. Iterations: " + i);
+        console.log("Block mined. Time elapsed: " + (Date.now() - startTime) + " ms. Iterations: " + this.nonce);
     };
     return Block;
 }());
