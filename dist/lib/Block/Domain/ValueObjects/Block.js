@@ -6,6 +6,12 @@ var Block = /** @class */ (function () {
         if (previousHash === void 0) { previousHash = ''; }
         this.date = Date.now();
         this.nonce = 0;
+        if (typeof index !== 'number' || index < 0) {
+            throw new Error('Index should be greater or equal to zero');
+        }
+        if (typeof previousHash !== 'string') {
+            throw new Error('Previous hash must to be a string');
+        }
         this.index = index;
         this.data = data;
         this.previousHash = previousHash;
@@ -31,7 +37,7 @@ var Block = /** @class */ (function () {
             this.nonce++;
             this.hash = this.createHash();
         }
-        console.log("Block mined. Time elapsed: " + (Date.now() - startTime) + " ms. Iterations: " + this.nonce);
+        //console.log(`Block mined. Time elapsed: ${Date.now() - startTime} ms. Iterations: ${this.nonce}`)
     };
     return Block;
 }());
