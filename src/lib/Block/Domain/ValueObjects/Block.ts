@@ -10,7 +10,7 @@ export default class Block {
   private readonly previousHash: string
 
   private readonly index: number
-  
+
   private hash: string
 
   private nonce: number = 0
@@ -19,7 +19,7 @@ export default class Block {
     this.index = index
     this.data = data
     this.previousHash = previousHash
-    this.hash = ''
+    this.hash = this.createHash()
   }
 
   getBlock(): IBlock {
