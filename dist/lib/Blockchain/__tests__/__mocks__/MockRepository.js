@@ -35,48 +35,49 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var Block_1 = __importDefault(require("../../Block/Domain/ValueObjects/Block"));
-var AddBlock = /** @class */ (function () {
-    function AddBlock(repository) {
-        this.repository = repository;
-    }
-    AddBlock.prototype.addBlock = function (data) {
-        return __awaiter(this, void 0, void 0, function () {
-            var last, e_1, genesis, newBlock;
+var MockRepository = /** @class */ (function () {
+    function MockRepository(config) {
+        var _this = this;
+        this.config = config;
+        this.get = jest.fn(function (criteria) { return __awaiter(_this, void 0, void 0, function () {
+            var filter;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.repository.getLast()];
-                    case 1:
-                        last = _a.sent();
-                        return [3 /*break*/, 3];
-                    case 2:
-                        e_1 = _a.sent();
-                        return [3 /*break*/, 3];
-                    case 3:
-                        if (!!last) return [3 /*break*/, 5];
-                        genesis = new Block_1.default(0, 'Everything starts here', '');
-                        return [4 /*yield*/, this.repository.addBlock(genesis)];
-                    case 4:
-                        _a.sent();
-                        last = genesis.getBlock();
-                        _a.label = 5;
-                    case 5:
-                        newBlock = new Block_1.default(last.index + 1, data, last.hash);
-                        newBlock.mine(0);
-                        return [4 /*yield*/, this.repository.addBlock(newBlock)];
-                    case 6:
-                        _a.sent();
-                        return [2 /*return*/];
+                filter = criteria.value();
+                if (this.config.getShouldFail) {
+                    throw new Error('Error');
                 }
+                if (this.config.getValue) {
+                    return [2 /*return*/, this.config.getValue];
+                }
+                else {
+                    return [2 /*return*/, []];
+                }
+                return [2 /*return*/];
             });
-        });
-    };
-    return AddBlock;
+        }); });
+        this.getLast = jest.fn(function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (this.config.lastShouldFail) {
+                    throw new Error('Error');
+                }
+                if (this.config.lastValue) {
+                    return [2 /*return*/, this.config.lastValue];
+                }
+                else {
+                    throw new Error('Error missing genesis');
+                }
+                return [2 /*return*/];
+            });
+        }); });
+        this.addBlock = jest.fn(function (block) { return __awaiter(_this, void 0, void 0, function () {
+            var data;
+            return __generator(this, function (_a) {
+                data = block.getBlock();
+                return [2 /*return*/];
+            });
+        }); });
+    }
+    return MockRepository;
 }());
-exports.default = AddBlock;
+exports.default = MockRepository;

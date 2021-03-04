@@ -39,44 +39,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Block_1 = __importDefault(require("../../Block/Domain/ValueObjects/Block"));
-var AddBlock = /** @class */ (function () {
-    function AddBlock(repository) {
-        this.repository = repository;
-    }
-    AddBlock.prototype.addBlock = function (data) {
-        return __awaiter(this, void 0, void 0, function () {
-            var last, e_1, genesis, newBlock;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.repository.getLast()];
-                    case 1:
-                        last = _a.sent();
-                        return [3 /*break*/, 3];
-                    case 2:
-                        e_1 = _a.sent();
-                        return [3 /*break*/, 3];
-                    case 3:
-                        if (!!last) return [3 /*break*/, 5];
-                        genesis = new Block_1.default(0, 'Everything starts here', '');
-                        return [4 /*yield*/, this.repository.addBlock(genesis)];
-                    case 4:
-                        _a.sent();
-                        last = genesis.getBlock();
-                        _a.label = 5;
-                    case 5:
-                        newBlock = new Block_1.default(last.index + 1, data, last.hash);
-                        newBlock.mine(0);
-                        return [4 /*yield*/, this.repository.addBlock(newBlock)];
-                    case 6:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
+var AddBlock_1 = __importDefault(require("../Application/AddBlock"));
+var MockRepository_1 = __importDefault(require("./__mocks__/MockRepository"));
+describe('AddBlock', function () {
+    it('should create genesis block when no last block present', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var repository, addBlock;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    repository = new MockRepository_1.default({ lastShouldFail: true });
+                    addBlock = new AddBlock_1.default(repository);
+                    return [4 /*yield*/, addBlock.addBlock('data')];
+                case 1:
+                    _a.sent();
+                    expect(repository.addBlock).toBeCalledTimes(2);
+                    return [2 /*return*/];
+            }
         });
-    };
-    return AddBlock;
-}());
-exports.default = AddBlock;
+    }); });
+    it('should not create genesis block when last block present', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var last, repository, addBlock;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    last = {
+                        data: '',
+                        date: 123,
+                        hash: '123412',
+                        index: 0,
+                        nonce: 0,
+                        previousHash: ''
+                    };
+                    repository = new MockRepository_1.default({ lastValue: last });
+                    addBlock = new AddBlock_1.default(repository);
+                    return [4 /*yield*/, addBlock.addBlock('data')];
+                case 1:
+                    _a.sent();
+                    expect(repository.addBlock).toBeCalledTimes(1);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
