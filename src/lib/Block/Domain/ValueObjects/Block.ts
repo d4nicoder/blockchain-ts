@@ -16,6 +16,13 @@ export default class Block {
   private nonce: number = 0
 
   constructor(index: number, data: string, previousHash: string = '') {
+    if (typeof index !== 'number' || index < 0) {
+      throw new Error('Index should be greater or equal to zero')
+    }
+
+    if (typeof previousHash !== 'string') {
+      throw new Error('Previous hash must to be a string')
+    }
     this.index = index
     this.data = data
     this.previousHash = previousHash
@@ -46,6 +53,6 @@ export default class Block {
       this.hash = this.createHash()
     }
 
-    console.log(`Block mined. Time elapsed: ${Date.now() - startTime} ms. Iterations: ${this.nonce}`)
+    //console.log(`Block mined. Time elapsed: ${Date.now() - startTime} ms. Iterations: ${this.nonce}`)
   }
 }

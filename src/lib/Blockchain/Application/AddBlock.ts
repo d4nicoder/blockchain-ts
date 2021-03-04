@@ -3,7 +3,7 @@ import { IBlockchainRepository } from "../Domain/Models/IBlockchainRepository";
 
 export default class AddBlock {
   constructor(private repository: IBlockchainRepository) { }
-  
+
   async addBlock(data: string): Promise<void> {
     let last
     try {
@@ -13,7 +13,6 @@ export default class AddBlock {
     }
 
     if (!last) {
-      console.log('Creating genesis')
       const genesis = new Block(0, 'Everything starts here', '')
       await this.repository.addBlock(genesis)
       last = genesis.getBlock()
