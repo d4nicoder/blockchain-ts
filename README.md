@@ -1,6 +1,6 @@
 # Blockchain approach in typescript
 
-[![Build](https://github.com/d4nicoder/blockchain-ts/actions/workflows/build.js.yml/badge.svg)](https://github.com/d4nicoder/blockchain-ts/actions/workflows/build.js.yml) [![Unit tests](https://github.com/d4nicoder/blockchain-ts/actions/workflows/test.js.yml/badge.svg)](https://github.com/d4nicoder/blockchain-ts/actions/workflows/test.js.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/d4nicoder/blockchain-ts/badge)](https://www.codefactor.io/repository/github/d4nicoder/blockchain-ts) [![Build](https://github.com/d4nicoder/blockchain-ts/actions/workflows/build.js.yml/badge.svg)](https://github.com/d4nicoder/blockchain-ts/actions/workflows/build.js.yml) [![Unit tests](https://github.com/d4nicoder/blockchain-ts/actions/workflows/test.js.yml/badge.svg)](https://github.com/d4nicoder/blockchain-ts/actions/workflows/test.js.yml)
 
 This is a simple blockchain implementation written in typescript. I am not an expert in blockchain technology, therefore everything you see here could be poorly implemented or not safe for production environments.
 
