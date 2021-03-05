@@ -9,6 +9,14 @@ describe('Block', () => {
     expect(block.getBlock().hash).toEqual('d684e13af0895b46d1325dffab33fdbb2ca8ec7921a13c9e2171b60d0832d720')
   })
 
+  it('should generate hash with matched difficulty', () => {
+    jest.spyOn(global.Date, 'now')
+      .mockImplementationOnce(() => 1614880248673)
+    const block = new Block(0, 'Everything starts here', '')
+    block.mine(2)
+    expect(block.getBlock().hash.startsWith('00')).toBe(true)
+  })
+
   it('should fail when negative index provided', () => {
     expect(() => {
       const block = new Block(-1, 'Everything starts here', '')
