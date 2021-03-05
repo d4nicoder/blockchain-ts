@@ -2,3 +2,4 @@ node_modules
 database
 yarn-error.log
 .env
+coverage

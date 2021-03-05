@@ -17,6 +17,13 @@ describe('Block', () => {
     expect(block.getBlock().hash.startsWith('00')).toBe(true)
   })
 
+  it('should an empty previous hash when not provided', () => {
+    jest.spyOn(global.Date, 'now')
+      .mockImplementationOnce(() => 1614880248673)
+    const block = new Block(0, 'Everything starts here')
+    expect(block.getBlock().previousHash).toEqual('')
+  })
+
   it('should fail when negative index provided', () => {
     expect(() => {
       const block = new Block(-1, 'Everything starts here', '')
