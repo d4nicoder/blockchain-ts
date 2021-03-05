@@ -1,0 +1,11 @@
+version: "2"
+services:
+  couchdb:
+    image: couchdb:3.1.1
+    environment:
+      COUCHDB_USER: "admin"
+      COUCHDB_PASSWORD: "admin"
+      COUCHDB_SECRET: "mysupersecret"
+      NODENAME: "master"
+    ports:
+     - "5984:5984"
