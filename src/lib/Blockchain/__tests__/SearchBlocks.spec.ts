@@ -1,7 +1,4 @@
-import { IBlock } from "../../Block/Domain/Models/IBlock"
-import AddBlock from "../Application/AddBlock"
 import SearchBlocks from "../Application/SearchBlocks"
-import BlockCriteria from "../Domain/ValueObjects/BlockCriteria"
 import MockRepository from "./__mocks__/MockRepository"
 
 describe('AddBlock', () => {
