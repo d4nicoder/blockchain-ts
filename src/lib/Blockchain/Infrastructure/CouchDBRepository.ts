@@ -128,6 +128,18 @@ export default class CouchDBRepository implements IBlockchainRepository {
       })
     }
 
+    if (filter.hash) {
+      query.$and.push({
+        hash: filter.hash
+      })
+    }
+
+    if (filter.previousHash) {
+      query.$and.push({
+        previousHash: filter.previousHash
+      })
+    }
+
     const queryObject = {
       selector: query,
       sort: [

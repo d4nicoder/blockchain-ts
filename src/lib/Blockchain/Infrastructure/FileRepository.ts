@@ -8,7 +8,7 @@ import Block from '../../Block/Domain/ValueObjects/Block';
 export default class FileRepository implements IBlockchainRepository {
 
   private filename = path.resolve(path.join(__dirname, '..', '..', '..', '..', 'database', 'blockchain.json'))
-  
+
 
   private async ensureDir(): Promise<void> {
     let exists = false
@@ -22,7 +22,7 @@ export default class FileRepository implements IBlockchainRepository {
 
     if (!exists) {
       await fs.promises.mkdir(path.dirname(this.filename), { recursive: true })
-      await fs.promises.writeFile(this.filename, '{"blockchain": []}', {encoding: 'utf-8'})
+      await fs.promises.writeFile(this.filename, '{"blockchain": []}', { encoding: 'utf-8' })
     }
   }
 
@@ -55,6 +55,14 @@ export default class FileRepository implements IBlockchainRepository {
           return false
         }
       }
+
+      if (filter.hash && block.hash !== filter.hash) {
+        return false
+      }
+
+      if (filter.previousHash && block.previousHash !== filter.previousHash) {
+        return false
+      }
       return true
     })
   }
@@ -78,8 +86,8 @@ export default class FileRepository implements IBlockchainRepository {
       blockchain
     }
 
-    await fs.promises.writeFile(this.filename, JSON.stringify(content, null, 2), {encoding: 'utf-8'})
+    await fs.promises.writeFile(this.filename, JSON.stringify(content, null, 2), { encoding: 'utf-8' })
   }
-  
+
 
 }

@@ -69,4 +69,20 @@ describe('BlockCriteria', function () {
         var criteria = new BlockCriteria_1.default(data);
         expect(criteria.value()).toEqual({ index: { from: 1, to: 2 } });
     });
+    it('should return correct hash on criteria object', function () {
+        var hash = 'sampleHash';
+        var data = {
+            hash: hash
+        };
+        var criteria = new BlockCriteria_1.default(data);
+        expect(criteria.value()).toEqual({ hash: hash });
+    });
+    it('should return correct previousHash on criteria object', function () {
+        var previousHash = 'sampleHash';
+        var data = {
+            previousHash: previousHash
+        };
+        var criteria = new BlockCriteria_1.default(data);
+        expect(criteria.value()).toEqual({ previousHash: previousHash });
+    });
 });

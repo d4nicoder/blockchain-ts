@@ -118,6 +118,12 @@ var FileRepository = /** @class */ (function () {
                                         return false;
                                     }
                                 }
+                                if (filter.hash && block.hash !== filter.hash) {
+                                    return false;
+                                }
+                                if (filter.previousHash && block.previousHash !== filter.previousHash) {
+                                    return false;
+                                }
                                 return true;
                             })];
                 }
