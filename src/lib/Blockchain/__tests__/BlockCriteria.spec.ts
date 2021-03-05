@@ -71,4 +71,22 @@ describe('BlockCriteria', () => {
     const criteria = new BlockCriteria(data)
     expect(criteria.value()).toEqual({ index: { from: 1, to: 2 } })
   })
+
+  it('should return correct hash on criteria object', () => {
+    const hash = 'sampleHash'
+    const data = {
+      hash
+    }
+    const criteria = new BlockCriteria(data)
+    expect(criteria.value()).toEqual({ hash })
+  })
+
+  it('should return correct previousHash on criteria object', () => {
+    const previousHash = 'sampleHash'
+    const data = {
+      previousHash
+    }
+    const criteria = new BlockCriteria(data)
+    expect(criteria.value()).toEqual({ previousHash })
+  })
 })

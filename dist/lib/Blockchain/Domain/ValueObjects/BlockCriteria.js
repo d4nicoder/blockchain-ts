@@ -15,6 +15,12 @@ var BlockCriteria = /** @class */ (function () {
                 to: data.index.to
             };
         }
+        if (data.hash && typeof data.hash === 'string') {
+            this.criteria.hash = data.hash;
+        }
+        if (data.previousHash && typeof data.previousHash === 'string') {
+            this.criteria.previousHash = data.previousHash;
+        }
     }
     BlockCriteria.prototype.value = function () {
         return this.criteria;

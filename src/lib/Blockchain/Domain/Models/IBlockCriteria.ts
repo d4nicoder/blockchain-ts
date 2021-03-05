@@ -7,4 +7,6 @@ export interface IBlockCriteria {
     from: number;
     to: number;
   };
+  hash?: string;
+  previousHash?: string;
 }

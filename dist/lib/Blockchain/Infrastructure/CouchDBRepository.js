@@ -193,6 +193,16 @@ var CouchDBRepository = /** @class */ (function () {
                                 }
                             });
                         }
+                        if (filter.hash) {
+                            query.$and.push({
+                                hash: filter.hash
+                            });
+                        }
+                        if (filter.previousHash) {
+                            query.$and.push({
+                                previousHash: filter.previousHash
+                            });
+                        }
                         queryObject = {
                             selector: query,
                             sort: [
