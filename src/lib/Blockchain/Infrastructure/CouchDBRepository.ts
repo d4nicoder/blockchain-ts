@@ -3,6 +3,8 @@ import Block from "../../Block/Domain/ValueObjects/Block";
 import { IBlockchainRepository } from "../Domain/Models/IBlockchainRepository";
 import BlockCriteria from "../Domain/ValueObjects/BlockCriteria";
 import axios from 'axios'
+// @ts-ignore
+import httpAdapter from 'axios/lib/adapters/http.js'
 export default class CouchDBRepository implements IBlockchainRepository {
 
   private readonly DATABASE = process.env.COUCH_DB_DATABASE
@@ -12,11 +14,14 @@ export default class CouchDBRepository implements IBlockchainRepository {
   private getHeaders() {
     const user = process.env.COUCH_DB_USER
     const pass = process.env.COUCH_DB_PASS
-
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}`
+    let headers: any = {
+      'Content-Type': 'application/json'
     }
+
+    if (user && pass) {
+      headers['Authorization'] = `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}`
+    }
+    return headers
   }
 
   private async query(url: string, method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE', body: string) {
@@ -30,10 +35,11 @@ export default class CouchDBRepository implements IBlockchainRepository {
         url: uri,
         method,
         headers,
-        data: buf
+        data: buf,
+        adapter: httpAdapter
       })
     } catch (e) {
-      console.error(e.response.data)
+      console.error(e)
       throw e
     }
     return res.data
@@ -96,9 +102,10 @@ export default class CouchDBRepository implements IBlockchainRepository {
   }
 
   async get(criteria: BlockCriteria): Promise<IBlock[]> {
+    await this.ensureDatabase()
     const filter = criteria.value()
 
-    const query: any = { $and: [] }
+    let query: any = { $and: [] }
 
     if (filter.date) {
       query.$and.push({
@@ -140,6 +147,10 @@ export default class CouchDBRepository implements IBlockchainRepository {
       })
     }
 
+    if (query.$and.length === 0) {
+      query = {}
+    }
+
     const queryObject = {
       selector: query,
       sort: [
@@ -152,12 +163,12 @@ export default class CouchDBRepository implements IBlockchainRepository {
     const method = 'POST'
     const url = `/${this.DATABASE}/_find`
 
-    const results = await await this.query(url, method, JSON.stringify(queryObject))
-    console.log(results)
-    return results
+    const results = await this.query(url, method, JSON.stringify(queryObject))
+    return results.docs
   }
 
   async getLast(): Promise<IBlock> {
+    await this.ensureDatabase()
     const queryObject = {
       selector: {},
       sort: [
