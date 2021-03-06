@@ -10,6 +10,15 @@ on:
 jobs:
   e2e_tests:
     runs-on: ubuntu-latest
+    container: ubuntu
+    services:
+      couchdb:
+        image: couchdb:3.1.1
+        env:
+          COUCHDB_USER: "admin"
+          COUCHDB_PASSWORD: "admin"
+          COUCHDB_SECRET: "mysupersecret"
+          NODENAME: "master"
 
     strategy:
       matrix:
