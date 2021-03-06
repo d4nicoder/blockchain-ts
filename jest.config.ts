@@ -4,6 +4,18 @@
  */
 
 export default {
+  projects: [
+    {
+      displayName: 'e2e',
+      preset: 'ts-jest',
+      testMatch: ['<rootDir>/**/__e2e__/**/*.spec.ts']
+    },
+    {
+      displayName: 'unit',
+      preset: 'ts-jest',
+      testMatch: ['<rootDir>/**/__tests__/**/*.spec.ts']
+    }
+  ],
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -158,9 +170,9 @@ export default {
   //   "**/__tests__/**/*.[jt]s?(x)",
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
   // ],
-  testMatch: [
-    "**/__tests__/**/*.spec.ts"
-  ],
+  // testMatch: [
+  //   "**/__tests__/**/*.spec.ts"
+  // ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [
