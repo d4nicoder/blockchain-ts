@@ -19,6 +19,8 @@ jobs:
           COUCHDB_PASSWORD: "admin"
           COUCHDB_SECRET: "mysupersecret"
           NODENAME: "master"
+        ports:
+          - "5984:5984"
 
     strategy:
       matrix:
