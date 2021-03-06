@@ -17,7 +17,7 @@ export default class FileRepository implements IBlockchainRepository {
       const stat = await fs.promises.stat(path.dirname(this.filename))
       exists = stat.isDirectory()
     } catch (e) {
-      console.log('Database not exists, creating it')
+      // Creating new database
     }
 
     if (!exists) {
